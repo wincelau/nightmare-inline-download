@@ -36,6 +36,9 @@ Defines whether or not all downloads should be ignored.
 ### maxDownloadRequestWait
 Sets the maximum time for the client to anticipate a `.download()` call.  If the call is not made, the download is automatically cancelled.
 
+### timeoutDownloadBeforeStart
+Sets a timeout to wait that a download is run, after it will continue execution normally.
+
 ### paths.downloads
 Sets the Electron path for where downloads are saved.
 

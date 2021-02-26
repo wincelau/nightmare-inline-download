@@ -17,6 +17,10 @@ module.exports = exports = function(Nightmare) {
         _parentRequestedDownload = true;
       });
 
+      parent.on('unexpect-download', function() {
+        _parentRequestedDownload = false;
+      });
+
       win.webContents.session.on('will-download',
         function(event, downloadItem, webContents) {
           //pause the download and set the save path to prevent dialog
@@ -110,8 +114,23 @@ module.exports = exports = function(Nightmare) {
       } else {
         done = arguments[0];
       }
-      
+
+      var stopExpectDownload = function() {
+        self.child.removeListener('download', handler);
+        self.child.emit('uneexpect-download');
+        debug("no download wait timeout");
+        done();
+      }
+
+      timeoutBeforeStart = null;
+      if(self.options.timeoutDownloadBeforeStart) {
+        timeoutBeforeStart = setTimeout(stopExpectDownload, self.options.timeoutDownloadBeforeStart);
+      }
+
       var handler = function(state, downloadInfo) {
+        if(timeoutBeforeStart) {
+          clearTimeout(timeoutBeforeStart);
+        }
         downloadInfo.state = state;
         debug('download', downloadInfo);
         if (state == 'started') {
